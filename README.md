@@ -1,4 +1,4 @@
-# **3d-ai-avatars-server – Python Backend for 3D AI Avatar Chatbot**
+# **DoYouTrustMe – 3D AI Avatar Chatbot (Server) – Python Backend for 3D AI Avatar Chatbot**
 
 This repository contains the **Python backend** used in the *DoYouTrustMe – 3D AI Avatar Chatbot* research project.
 It provides endpoints for:
