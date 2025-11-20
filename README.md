@@ -1,50 +1,47 @@
-# **DoYouTrustMe – 3D AI Avatar Chatbot (Server) – Python Backend for 3D AI Avatar Chatbot**
+# **DoYouTrustMe – 3D AI Avatar Chatbot (Server)**  
+Python backend for the *DoYouTrustMe – 3D AI Avatar Chatbot* research project.
 
-This repository contains the **Python backend** used in the *DoYouTrustMe – 3D AI Avatar Chatbot* research project.
-It provides endpoints for:
+Provides:
+- **LLM access** (GWDG RAG Container or local Llama 3.1)
+- **STT** (Whisper)
+- **TTS** (Piper)
+- **Viseme/phoneme extraction** for 3D lip-sync
+- Lightweight REST API used by the SvelteKit frontend
 
-* **LLM access** (GWDG RAG Container)
-* **STT** (Whisper or cloud alternative)
-* **TTS** (Piper or cloud alternative)
-* **Viseme extraction** for lip-sync
-* **Utility APIs** for evaluation & debugging
-
-The server can run on **Linux (Ubuntu)** or **Windows**.
-
-> ⚠️ Research prototype – not optimized for production use.
+> ⚠️ Research prototype – not intended for production.
 
 ---
 
-# 🏗 **Architecture Overview**
-
-The Python server exposes a small REST API and acts as the central processing unit:
+## 🧩 Architecture (Short)
 
 ```
-SvelteKit Client  →  SvelteKit Proxy  →  HISTAR_SERVER  →  GWDG LLM / STT / TTS
-```
 
-Technologies:
+SvelteKit Client → SvelteKit Proxy → THIS_SERVER → LLM / STT / TTS
 
-* **Flask** (REST API)
-* **Whisper (CPU)** – STT
-* **Piper TTS** – speech synthesis
-* **Phoneme → Viseme mapping** for avatar lip-sync
-* **Gunicorn + Nginx** (recommended on Linux)
-* **Python 3.10**
+````
+
+Backend stack:
+- Flask (API)
+- Piper TTS
+- Whisper (CPU/GPU)
+- Phoneme → Viseme (BFA + phonemizer)
+- Optional: Gunicorn + Nginx on Linux
 
 ---
 
-# ⚙️ **Required Environment Variables**
+## 🔧 Required Environment Variables
 
-Create a `.env` file or set environment variables manually:
+Create a `.env` file:
 
 ```bash
-VM_API_KEY=your_api_key_here
+PIPER_VOICE_DIR=./voices
+VM_API_KEY=
+VM_API_URL=
 GWDG_API_KEY=
 GWDG_BASE_URL=
 GWDG_MODEL=meta-llama-3.1-8b-rag
 GWDG_ARCANA_ID=
-```
+````
 
 Optional:
 
@@ -55,165 +52,88 @@ PIPER_MODEL=de_DE-amy-medium
 
 ---
 
-# 🧪 **Local Development Setup**
+## 🧪 Local Setup
 
-## 🔵 **Windows Setup**
+### ▶️ Windows 11
 
 ```powershell
-# Remove old venv if needed
-rm -r .venv
-
-# Create venv with Python 3.10
-python3.10 -m venv .venv
+# Create venv (Python 3.10 required)
+py -3.10 -m venv .venv
 .venv\Scripts\activate
 
-# Install dependencies
+# Update pip
+python -m pip install --upgrade pip
+
+# Install backend dependencies
 pip install -r requirements.txt
-```
 
-Start server:
+# Install PyTorch (choose one):
+pip install torch==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu
+# or GPU:
+pip install torch==2.1.0+cu121 --index-url https://download.pytorch.org/whl/cu121
 
-```powershell
-python PythonServer\api\server.py
-```
-
----
-
-## 🟢 **Linux (Ubuntu 22.04+) Setup**
-
-### **1️⃣ Install Python 3.10**
-
-```bash
-sudo apt update
-sudo apt install -y software-properties-common
-sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt update
-sudo apt install -y python3.10 python3.10-venv python3.10-distutils python3.10-dev
-```
-
-Check:
-
-```bash
-python3.10 --version
-```
-
-(Optional) make Python 3.10 default:
-
-```bash
-sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.10 2
-sudo update-alternatives --config python3
-```
-
-### **2️⃣ CPU PyTorch (optional)**
-
-```bash
-pip install torch==2.1.0+cpu torchvision --index-url https://download.pytorch.org/whl/cpu
-```
-
-### **3️⃣ Create virtual environment**
-
-```bash
-rm -r .venv
-python3.10 -m venv .venv
-source .venv/bin/activate
-```
-
-### **4️⃣ Install dependencies**
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-# 🚀 **Running the Server**
-
-Inside the venv:
-
-```bash
+# Start server
 python PythonServer/api/server.py
 ```
 
-Health check:
+### ▶️ Linux (Ubuntu)
 
 ```bash
-curl -s http://127.0.0.1:5000/health
-# → "ok"
+sudo apt update
+sudo apt install python3.10 python3.10-venv ffmpeg
+
+python3.10 -m venv .venv
+source .venv/bin/activate
+
+pip install -r requirements.txt
+pip install torch==2.1.0+cpu --index-url https://download.pytorch.org/whl/cpu
+
+python PythonServer/api/server.py
 ```
 
 ---
 
-# 🔑 **Generate API Keys**
-
-```bash
-openssl rand -hex 32
-```
-
-Add to `.env`:
-
-```bash
-VM_API_KEY=your_hex_key
-```
-
----
-
-# 🧪 **Testing the GWDG LLM Endpoint**
-
-```bash
-curl -X POST http://127.0.0.1:5000/gwdg/ \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $VM_API_KEY" \
-  -d '{
-    "prompt": "Wann beginnt das Wintersemester im Master Informatik an der Universität Bremen?",
-    "animations": ["Idle", "Happy Idle", "Nodd", "Breathing"],
-    "expressions": ["Smile", "Neutral", "Surprised", "Confused"],
-    "userLanguage": "Deutsch",
-    "conversation": [],
-    "arcanaId": "ramon.desmit/Universität Bremen"
-  }'
-```
-
----
-
-# 📁 **Project Structure (Short)**
+## 📁 Project Structure
 
 ```
 📦PythonServer
  ┗ 📂api
- ┃ ┣ 📜gwdg_api.py
- ┃ ┣ 📜server.py
- ┃ ┣ 📜stt_api.py
- ┃ ┣ 📜tts_api.py
- ┃ ┗ 📜__init__.py
+    ┣ server.py        # Main entry
+    ┣ gwdg_api.py
+    ┣ stt_api.py
+    ┣ tts_api.py
+    ┗ __init__.py
 ```
 
 ---
 
-# 🔒 **Security Notes**
+## 🔒 Security
 
-* Authentication via `Authorization: Bearer <VM_API_KEY>`
-* Basic request sanitization (`_sanitize`)
-* Rate-limiting recommended via Nginx (example configs in thesis)
-* Do **not** expose without HTTPS
+* Auth via `Authorization: Bearer <VM_API_KEY>`
+* Basic input sanitization
+* Recommended: Nginx reverse proxy + HTTPS + rate limit
+* Do not expose to the public internet without protection
 
 ---
 
-# 📜 **Licensing**
+## 📜 License Notes
 
 Generate dependency licenses:
 
 ```bash
-pip-licenses --format=json --with-urls --with-license-file --with-system \
-  --output-file licenses/pip-licenses.json
+pip-licenses --format=json --with-urls --with-license-file \
+  --with-system --output-file licenses/pip-licenses.json
 ```
 
-This backend is provided **for academic research only**.
-Models for Whisper/Piper may carry their own licenses—verify before deployment.
+Whisper, Piper, and LLM models may have **additional licenses**.
+Ensure compliance before deployment.
 
 ---
 
-# 📧 **Contact**
+## 📧 Contact
 
-If you need help running the backend, connecting the SvelteKit client, or replacing TTS/STT/LLM providers, feel free to reach out.
+If you need help running the backend or integrating it with the SvelteKit client, feel free to reach out.
+
+```
 
 ---
