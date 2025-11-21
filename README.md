@@ -35,12 +35,11 @@ Create a `.env` file:
 
 ```bash
 PIPER_VOICE_DIR=./voices
-VM_API_KEY=
-VM_API_URL=
-GWDG_API_KEY=
-GWDG_BASE_URL=
-GWDG_MODEL=meta-llama-3.1-8b-rag
-GWDG_ARCANA_ID=
+SERVER_API_KEY=
+LLM_API_KEY=
+LLM_BASE_URL=
+LLM_MODEL=meta-llama-3.1-8b-rag
+LLM_RAG_ID=
 ````
 
 Optional:
@@ -109,7 +108,7 @@ python PythonServer/api/server.py
 
 ## 🔒 Security
 
-* Auth via `Authorization: Bearer <VM_API_KEY>`
+* Auth via `Authorization: Bearer <SERVER_API_KEY>`
 * Basic input sanitization
 * Recommended: Nginx reverse proxy + HTTPS + rate limit
 * Do not expose to the public internet without protection

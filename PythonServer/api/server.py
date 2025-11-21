@@ -16,10 +16,10 @@ from werkzeug.exceptions import HTTPException
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 # load key from .env, if missing => stop (no key = no api)
-VM_API_KEY = (os.getenv("VM_API_KEY") or "").strip()
-if not VM_API_KEY:
+SERVER_API_KEY = (os.getenv("SERVER_API_KEY") or "").strip()
+if not SERVER_API_KEY:
     # owasp: dont run w/o auth secrets (REST Sec) https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html  :contentReference[oaicite:0]{index=0}
-    raise RuntimeError("VM_API_KEY missing")  
+    raise RuntimeError("SERVER_API_KEY missing")  
 
 app = Flask(__name__)
 
@@ -78,7 +78,7 @@ def gate():
     if not auth.startswith("Bearer "):
         abort(401)
     token = auth[7:].strip()
-    if not _eq(token, VM_API_KEY):
+    if not _eq(token, SERVER_API_KEY):
         abort(401)
 
     # rate limit per token + client ip (from proxy)

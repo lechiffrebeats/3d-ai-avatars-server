@@ -6,8 +6,8 @@ import requests
 load_dotenv()
 gwdg_blueprint = Blueprint("gwdg_api", __name__)
 
-BASE_URL = os.getenv("GWDG_BASE_URL", "https://chat-ai.academiccloud.de/v1").rstrip("/")
-API_KEY  = (os.getenv("GWDG_API_KEY") or "").strip()
+BASE_URL = os.getenv("LLM_BASE_URL", "https://chat-ai.academiccloud.de/v1").rstrip("/")
+API_KEY  = (os.getenv("LLM_API_KEY") or "").strip()
 
 MODEL_RAG = "meta-llama-3.1-8b-rag"
 MODEL_FAST_AF = "qwen3-32b"
@@ -93,7 +93,7 @@ def _sys_message(lang: str):
 @gwdg_blueprint.route("/chat", methods=["POST"])
 def chat():
     if not API_KEY:
-        return Response('{"error":"GWDG_API_KEY missing"}', status=500, mimetype="application/json")
+        return Response('{"error":"LLM_API_KEY missing"}', status=500, mimetype="application/json")
     if not request.is_json:
         return Response('{"error":"content-type must be application/json"}', status=415, mimetype="application/json")
 
